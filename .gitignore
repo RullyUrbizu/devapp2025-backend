@@ -2,6 +2,7 @@
 .DS_Store
 Thumbs.db
 .tmp/
+.env
 
 # packageManager specific lock files #
 package-lock.json
