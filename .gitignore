@@ -1,0 +1,14 @@
+# OS generated files #
+.DS_Store
+Thumbs.db
+.tmp/
+
+# packageManager specific lock files #
+package-lock.json
+node_modules/
+
+# build process generated files #
+tsconfig.build.json
+
+# dist generated folder #
+dist/
