@@ -8,5 +8,7 @@ export interface Persona {
     fechaNacimiento: Date;
     genero: string;
     esDonante: Genero;
-    autos?: Auto[];
+    autos: Auto[];
 }
+
+export type PersonaParcial = Partial<Persona>;

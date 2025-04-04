@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint --format stylish --color --fix",
-    "start": "tsc && dotenvx run node dist/server.js",
+    "start": "tsc && dotenvx run node dist/server/server.js",
     "build": "tsc",
     "test": "npm run lint"
   },
