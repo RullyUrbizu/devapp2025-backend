@@ -1,7 +1,7 @@
-import { Request, Response } from 'express';
 import { Auto } from '../model/auto';
 import { AutoDto } from '../dto/autoDto';
 import autoRepository from '../repository/autoRepository';
+import personaRepository from '../repository/personaRepository';
 
 export const validarAuto = (auto: Auto) => {
     return (
@@ -16,8 +16,7 @@ export const validarAuto = (auto: Auto) => {
     );
 };
 
-const listar = (req: Request, res: Response) => {
-    const dni = req.query.dni as string | undefined;
+const listar = (dni?: string): AutoDto[] => {
     let autosFiltrados = autoRepository.listar();
 
     if (dni) {
@@ -29,27 +28,36 @@ const listar = (req: Request, res: Response) => {
         anio: auto.anio,
         patente: auto.patente
     }));
-    res.status(200).json(autosDto).send();
+    return autosDto;
 };
 
-const buscar = (req: Request, res: Response) => {
-    const patente = req.params.patente;
+const buscar = (patente: string) => {
     const auto = autoRepository.buscar(patente);
     if (!auto) {
-        res.status(404).json('Auto no encontrado').send();
+        return 'no se encontro el auto';
     }
-    res.status(200).json(auto).send();
+    return auto;
 };
 
-const borrar = (req: Request, res: Response) => {
-    //no funciona bien
-    const patente = req.params.patente;
+const actualizar = (patente: string, nuevoAuto?: JSON) => {
     const auto = autoRepository.buscar(patente);
     if (!auto) {
-        res.status(404).json('Auto no encontrado').send();
+        return 'no se encontro el auto';
     }
-    autoRepository.borrar(patente);
-    res.status(200).json('se elimino correctamente').send();
+
+    const persona = personaRepository.buscar(auto.duenio);
+    if (!persona) {
+        return 'no se encontro el dueño';
+    }
+
+    const autoActualizado = { ...auto, ...nuevoAuto };
+    autoRepository.actualizar(autoActualizado);
+
+    return autoActualizado;
 };
 
-export default { validarAuto, listar, buscar, borrar };
+const borrar = (patente: string) => {
+    return autoRepository.borrar(patente);
+};
+
+export default { validarAuto, listar, buscar, borrar, actualizar };

@@ -3,6 +3,7 @@ import { PersonaDto } from '../dto/personaDto';
 import personaRepository from '../repository/personaRepository';
 import autoService from '../service/autoService';
 import { Auto } from '../model/auto';
+import { v4 as uuidv4 } from 'uuid';
 
 const validarPersona = (persona: Persona) => {
     return (
@@ -16,22 +17,25 @@ const validarPersona = (persona: Persona) => {
 
 //add
 const agregar = (persona: Persona) => {
+    const id = uuidv4();
+    persona.id = id;
     if (validarPersona(persona)) {
-        return 'Datos inválidos';
+        throw new Error('Datos invalidos');
     }
     if (personaRepository.existe(persona.dni)) {
-        return `Persona con DNI ${persona.dni} ya existe`;
+        throw new Error(`Persona con DNI ${persona.dni} ya existe`);
     }
     const autosInvalidos = persona.autos.filter((a: Auto) => autoService.validarAuto(a));
     if (autosInvalidos.length > 0) {
-        return 'Algún auto es inválido';
+        throw new Error('Algún auto es invalido');
     }
     personaRepository.create(persona);
 };
 
 //browse
 const listar = (): PersonaDto[] => {
-    return personaRepository.listar().map(({ nombre, apellido, dni }) => ({
+    return personaRepository.listar().map(({ id, nombre, apellido, dni }) => ({
+        id,
         nombre,
         apellido,
         dni
@@ -43,6 +47,17 @@ const buscar = (dni: string) => {
     return personaRepository.buscar(dni);
 };
 
+// Edit
+const editar = (dni: string, nuevosDatos?: JSON) => {
+    const persona = personaRepository.buscar(dni);
+    if (!persona) {
+        return 'ninguna persona con ese dni';
+    }
+    const nuevaPersona = { ...persona, ...nuevosDatos };
+    personaRepository.actualizar(nuevaPersona);
+    return 'Se actualizo correctamente';
+};
+
 //delete
 const borrar = (dni: string) => {
     const persona = personaRepository.buscar(dni);
@@ -52,4 +67,4 @@ const borrar = (dni: string) => {
     return personaRepository.borrar(dni);
 };
 
-export default { agregar, listar, buscar, borrar };
+export default { agregar, listar, buscar, borrar, editar };

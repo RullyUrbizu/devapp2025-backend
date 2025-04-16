@@ -5,11 +5,8 @@ import bodyParser from 'body-parser';
 import helmet from 'helmet';
 import process from 'process';
 
+import autoController from '../controller/autoController';
 import personaController from '../controller/personaController';
-import autoService from '../service/autoService';
-
-import { Persona } from '../model/persona';
-import { Auto } from '../model/auto';
 
 // Creamos nuestra app express
 const app = express();
@@ -37,45 +34,24 @@ app.post('/persona', personaController.agregar);
 // Browse
 app.get('/personas', personaController.listar);
 
-app.get('/autos', autoService.listar);
+app.get('/autos', autoController.listar);
 
 // Read
 app.get('/persona/:dni', personaController.buscar);
 
-app.get('/auto/:patente', autoService.buscar);
+app.get('/auto/:patente', autoController.buscar);
 
 // Edit
-app.put('/persona/:dni', (req, res) => {
-    const dni = req.params.dni;
-    const persona = personas.find((persona: Persona) => persona.dni === dni);
+app.put('/persona/:dni', personaController.actualizar);
 
-    if (!persona) {
-        res.send(404).json({ message: 'Persona no encontrada' });
-    }
-    const nuevaPersona = { ...persona, ...req.body };
-    res.status(201).json(nuevaPersona);
-});
-
-app.put('/auto/:patente', (req, res) => {
-    const patente = req.params.patente;
-    const auto = autos.find((auto: Auto) => auto.patente === patente);
-    if (!auto) {
-        res.send(404).json({ message: 'Auto no encontrada' });
-    }
-    const nuevoAuto = { ...auto, ...req.body };
-    res.status(201).json(nuevoAuto);
-});
+app.put('/auto/:patente', autoController.actualizar);
 
 // Delete
 app.delete('/persona/:dni', personaController.borrar);
 
-app.delete('/auto/:patente', autoService.borrar);
+app.delete('/auto/:patente', autoController.borrar);
 
 // Levantamos el servidor en el puerto que configuramos
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
 });
-
-// por ahora guardo las personas en esta lista, hasta que conectemos la bdd
-const personas: Persona[] = [];
-const autos: Auto[] = [];

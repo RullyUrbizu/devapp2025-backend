@@ -12,12 +12,18 @@ const create = (persona: Persona) => {
     personas.push(persona);
 };
 
-const buscar = (dni: string) => {
-    return personas.find((p) => p.dni === dni);
+const buscar = (id: string) => {
+    return personas.find((p) => p.id === id);
 };
-const borrar = (dni: string) => {
-    personas = personas.filter((p: Persona) => p.dni !== dni);
+const borrar = (id: string) => {
+    personas = personas.filter((p: Persona) => p.id !== id);
     return;
 };
+const actualizar = (persona: Persona) => {
+    const ubicacion = personas.findIndex((p) => p.id === persona.id);
+    if (ubicacion !== -1) {
+        personas[ubicacion] = persona;
+    }
+};
 
-export default { existe, listar, create, buscar, borrar };
+export default { existe, listar, create, buscar, borrar, actualizar };
