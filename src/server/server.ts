@@ -31,6 +31,8 @@ app.get('/', (req, res) => {
 // Add
 app.post('/persona', personaController.agregar);
 
+app.post('/auto', autoController.agregar);
+
 // Browse
 app.get('/personas', personaController.listar);
 
@@ -39,17 +41,17 @@ app.get('/autos', autoController.listar);
 // Read
 app.get('/persona/:dni', personaController.buscar);
 
-app.get('/auto/:patente', autoController.buscar);
+app.get('/auto/:id', autoController.buscar);
 
 // Edit
 app.put('/persona/:dni', personaController.actualizar);
 
-app.put('/auto/:patente', autoController.actualizar);
+app.put('/auto/:id', autoController.actualizar);
 
 // Delete
 app.delete('/persona/:dni', personaController.borrar);
 
-app.delete('/auto/:patente', autoController.borrar);
+app.delete('/auto/:id', autoController.borrar);
 
 // Levantamos el servidor en el puerto que configuramos
 app.listen(port, () => {
