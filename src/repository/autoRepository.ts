@@ -24,7 +24,6 @@ const existe = (id: string) => {
 
 const buscar = (id: string) => {
     const auto = listar().find((a: Auto) => a.id === id);
-    console.log(auto);
     return auto;
 };
 const borrar = (id: string) => {

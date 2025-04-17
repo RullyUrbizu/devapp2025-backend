@@ -1,16 +1,16 @@
 import { Request, Response } from 'express';
 import autoService from '../service/autoService';
 import { Auto } from '../model/auto';
-import { error } from 'console';
 
 const agregar = (req: Request, res: Response) => {
-    const auto: Auto = req.body;
-    autoService.agregar(auto);
-
-    if (!error) {
-        res.status(400).json({ mensaje: error }).send();
+    try {
+        const auto: Auto = req.body;
+        autoService.agregar(auto); // asumimos que lanza error si algo falla
+        res.status(201).json('Se agregó el auto correctamente');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+        res.status(400).json(err.message || 'Error al agregar el auto');
     }
-    res.status(201).json('Se agrego el auto correctamente').send();
 };
 
 // Browse
@@ -22,21 +22,38 @@ const listar = (req: Request, res: Response) => {
 
 // Read
 const buscar = (req: Request, res: Response) => {
-    const id = req.params.id;
-    const auto = autoService.buscar(id);
-    if (!auto) {
-        res.status(404).json('Auto no encontrao').send();
+    try {
+        const id = req.params.id;
+        const auto = autoService.buscar(id);
+
+        if (!auto) {
+            res.status(404).json({ mensaje: 'Auto no encontrado' });
+        }
+
+        res.status(200).json(auto);
+    } catch (err) {
+        console.error('Error al buscar auto:', err);
+        res.status(500).json({ mensaje: 'Error interno del servidor' });
     }
-    res.status(200).json(auto).send();
 };
+
 // Edit
 const actualizar = (req: Request, res: Response) => {
-    const id = req.params.id;
-    const auto = autoService.actualizar(id, req.body);
-    if (!auto) {
-        res.status(404).json('Auto no encontrao').send();
+    try {
+        const id = req.params.id;
+        const auto = autoService.actualizar(id, req.body);
+        res.status(200).json(auto).send();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+        if (err.message === 'Auto no encontrado') {
+            res.status(404).json('Auto no encontrado');
+        }
+        if (err.message === 'Dueño no encontrado') {
+            res.status(404).json('Dueño no encontrado');
+        }
+        console.error(err);
+        res.status(500).json('Error interno del servidor');
     }
-    res.status(200).json(auto).send();
 };
 
 // Delete
