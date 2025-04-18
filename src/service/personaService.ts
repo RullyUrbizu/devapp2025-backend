@@ -43,28 +43,28 @@ const listar = (): PersonaDto[] => {
 };
 
 //read
-const buscar = (dni: string) => {
-    return personaRepository.buscar(dni);
+const buscar = (id: string) => {
+    return personaRepository.buscar(id);
 };
 
 // Edit
-const editar = (dni: string, nuevosDatos?: JSON) => {
-    const persona = personaRepository.buscar(dni);
+const editar = (id: string, nuevosDatos?: Partial<Persona>) => {
+    const persona = personaRepository.buscar(id);
     if (!persona) {
-        return 'ninguna persona con ese dni';
+        throw new Error('No existe esa persona');
     }
     const nuevaPersona = { ...persona, ...nuevosDatos };
     personaRepository.actualizar(nuevaPersona);
-    return 'Se actualizo correctamente';
+    return nuevaPersona;
 };
 
 //delete
-const borrar = (dni: string) => {
-    const persona = personaRepository.buscar(dni);
+const borrar = (id: string) => {
+    const persona = personaRepository.buscar(id);
     if (!persona) {
-        return 'no se pudo eliminar';
+        throw new Error('no se pudo eliminar');
     }
-    return personaRepository.borrar(dni);
+    return personaRepository.borrar(id);
 };
 
 export default { agregar, listar, buscar, borrar, editar };

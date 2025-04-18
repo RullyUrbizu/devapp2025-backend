@@ -39,17 +39,17 @@ app.get('/personas', personaController.listar);
 app.get('/autos', autoController.listar);
 
 // Read
-app.get('/persona/:dni', personaController.buscar);
+app.get('/persona/:id', personaController.buscar);
 
 app.get('/auto/:id', autoController.buscar);
 
 // Edit
-app.put('/persona/:dni', personaController.actualizar);
+app.put('/persona/:id', personaController.actualizar);
 
 app.put('/auto/:id', autoController.actualizar);
 
 // Delete
-app.delete('/persona/:dni', personaController.borrar);
+app.delete('/persona/:id', personaController.borrar);
 
 app.delete('/auto/:id', autoController.borrar);
 

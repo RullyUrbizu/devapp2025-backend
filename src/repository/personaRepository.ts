@@ -28,7 +28,6 @@ const actualizar = (persona: Persona) => {
     const ubicacion = personas.findIndex((p) => p.id === persona.id);
     if (ubicacion !== -1) {
         personas[ubicacion] = persona;
-        console.log('Persona actualizada:', persona);
     } else {
         console.log('No se encontró la persona para actualizar');
     }
