@@ -3,7 +3,7 @@ import { Persona } from '../model/persona';
 import personaRepository from './personaRepository';
 
 const create = (auto: Auto) => {
-    const persona = personaRepository.buscarByDni(auto.duenio);
+    const persona = personaRepository.buscar(auto.duenio);
 
     if (persona) {
         persona.autos.push(auto);
@@ -40,7 +40,7 @@ const borrar = (id: string) => {
 };
 
 const actualizar = (autoActualizado: Auto) => {
-    const persona = personaRepository.buscarByDni(autoActualizado.duenio);
+    const persona = personaRepository.buscar(autoActualizado.duenio);
     if (!persona) return;
 
     persona.autos = persona.autos.map((a) => (a.patente === autoActualizado.patente ? autoActualizado : a));

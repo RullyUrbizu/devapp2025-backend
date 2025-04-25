@@ -15,8 +15,8 @@ const agregar = (req: Request, res: Response) => {
 
 // Browse
 const listar = (req: Request, res: Response) => {
-    const dni = req.query.dni as string | undefined;
-    const autos = autoService.listar(dni);
+    const id = req.query.id as string | undefined;
+    const autos = autoService.listar(id);
     res.status(200).json(autos);
 };
 

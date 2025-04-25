@@ -27,18 +27,18 @@ const agregar = (auto: Auto) => {
     if (personaRepository.existe(auto.patente)) {
         throw new Error(`La patente ${auto.patente} ya esta en uso`);
     }
-    const duenioExiste = personaRepository.buscarByDni(auto.duenio);
+    const duenioExiste = personaRepository.buscar(auto.duenio);
     if (!duenioExiste) {
         throw new Error(`El dueño con DNI ${auto.duenio} no existe`);
     }
     autoRepository.create(auto);
 };
 
-const listar = (dni?: string): AutoDto[] => {
+const listar = (id?: string): AutoDto[] => {
     let autosFiltrados = autoRepository.listar();
 
-    if (dni) {
-        autosFiltrados = autosFiltrados.filter((a: Auto) => a.duenio === dni);
+    if (id) {
+        autosFiltrados = autosFiltrados.filter((a: Auto) => a.duenio === id);
     }
     const autosDto: AutoDto[] = autosFiltrados.map((auto: Auto) => ({
         id: auto.id,
@@ -61,7 +61,7 @@ const actualizar = (id: string, nuevoAuto?: Partial<Auto>) => {
         throw new Error('Auto no encontrado');
     }
 
-    const persona = personaRepository.buscarByDni(auto.duenio);
+    const persona = personaRepository.buscar(auto.duenio);
     if (!persona) {
         throw new Error('Dueño no encontrado');
     }
