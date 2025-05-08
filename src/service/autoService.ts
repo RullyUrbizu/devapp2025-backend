@@ -1,7 +1,7 @@
 import { Auto } from '../model/auto';
 import { AutoDto } from '../dto/autoDto';
-import autoRepository from '../repository/autoRepository';
-import personaRepository from '../repository/personaRepository';
+import AutoMemoryRepository from '../repository/memory/AutoMemoryRepository';
+import PersonaMemoryRepository from '../repository/memory/PersonaMemoryRepository';
 import { v4 as uuidv4 } from 'uuid';
 
 export const validarAuto = (auto: Auto) => {
@@ -17,63 +17,65 @@ export const validarAuto = (auto: Auto) => {
     );
 };
 
-//add
-const agregar = (auto: Auto) => {
+// add
+const agregar = async (auto: Auto): Promise<void> => {
     const id = uuidv4();
     auto.id = id;
+
     if (validarAuto(auto)) {
-        throw new Error('Datos invalidos');
+        throw new Error('Datos inválidos');
     }
-    if (personaRepository.existe(auto.patente)) {
-        throw new Error(`La patente ${auto.patente} ya esta en uso`);
+
+    const duenio = await PersonaMemoryRepository.get(auto.duenio);
+    if (!duenio) {
+        throw new Error('Dueño no existe');
     }
-    const duenioExiste = personaRepository.buscar(auto.duenio);
-    if (!duenioExiste) {
-        throw new Error(`El dueño con DNI ${auto.duenio} no existe`);
+
+    const autos = await AutoMemoryRepository.all();
+    const patenteEnUso = autos.some((a) => a.patente === auto.patente);
+    if (patenteEnUso) {
+        throw new Error(`La patente ${auto.patente} ya está en uso`);
     }
-    autoRepository.create(auto);
+
+    await AutoMemoryRepository.save(auto);
 };
 
-const listar = (id?: string): AutoDto[] => {
-    let autosFiltrados = autoRepository.listar();
+const listar = async (id?: string): Promise<AutoDto[]> => {
+    let autos = await AutoMemoryRepository.all();
 
     if (id) {
-        autosFiltrados = autosFiltrados.filter((a: Auto) => a.duenio === id);
+        autos = autos.filter((a) => a.duenio === id);
     }
-    const autosDto: AutoDto[] = autosFiltrados.map((auto: Auto) => ({
+
+    return autos.map((auto) => ({
         id: auto.id,
         marca: auto.marca,
         modelo: auto.modelo,
         anio: auto.anio,
         patente: auto.patente
     }));
-    return autosDto;
 };
 
-const buscar = (id: string) => {
-    const auto = autoRepository.buscar(id);
-    return auto;
+const buscar = async (id: string): Promise<Auto> => {
+    return await AutoMemoryRepository.get(id);
 };
 
-const actualizar = (id: string, nuevoAuto?: Partial<Auto>) => {
-    const auto = autoRepository.buscar(id);
-    if (!auto) {
-        throw new Error('Auto no encontrado');
-    }
+const actualizar = async (id: string, nuevoAuto?: Partial<Auto>): Promise<Auto> => {
+    const auto = await AutoMemoryRepository.get(id);
 
-    const persona = personaRepository.buscar(auto.duenio);
+    const persona = await PersonaMemoryRepository.get(auto.duenio);
     if (!persona) {
         throw new Error('Dueño no encontrado');
     }
 
-    const autoActualizado = { ...auto, ...nuevoAuto };
-    autoRepository.actualizar(autoActualizado);
+    const autoActualizado = { ...auto, ...nuevoAuto, id };
+    await AutoMemoryRepository.save(autoActualizado);
 
     return autoActualizado;
 };
 
-const borrar = (id: string) => {
-    return autoRepository.borrar(id);
+const borrar = async (id: string): Promise<boolean> => {
+    return await AutoMemoryRepository.delete(id);
 };
 
 export default { agregar, validarAuto, listar, buscar, borrar, actualizar };

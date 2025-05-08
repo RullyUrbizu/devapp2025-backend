@@ -4,10 +4,10 @@ import personaService from '../service/personaService';
 import { Persona } from '../model/persona';
 
 // Add
-const agregar = (req: Request, res: Response) => {
+const agregar = async (req: Request, res: Response) => {
     try {
         const persona: Persona = req.body;
-        personaService.agregar(persona);
+        await personaService.agregar(persona);
         res.status(201).json('Se agregó la persona correctamente').send();
     } catch (err) {
         console.error(err);
@@ -16,14 +16,14 @@ const agregar = (req: Request, res: Response) => {
 };
 
 // Browse
-const listar = (req: Request, res: Response) => {
-    const personas = personaService.listar();
+const listar = async (req: Request, res: Response) => {
+    const personas = await personaService.listar();
     res.status(200).json(personas);
 };
 
 // Read
-const buscar = (req: Request, res: Response) => {
-    const persona = personaService.buscar(req.params.id);
+const buscar = async (req: Request, res: Response) => {
+    const persona = await personaService.buscar(req.params.id);
     if (!persona) {
         res.status(404).json('Persona no encontrada').send();
     }
@@ -31,11 +31,11 @@ const buscar = (req: Request, res: Response) => {
 };
 
 // Edit
-const actualizar = (req: Request, res: Response) => {
+const actualizar = async (req: Request, res: Response) => {
     const id = req.params.id;
 
     try {
-        const personaActualizada = personaService.editar(id, req.body);
+        const personaActualizada = await personaService.editar(id, req.body);
         res.status(200).json(personaActualizada);
     } catch (err: any) {
         res.status(404).json({ mensaje: err.message });
@@ -43,10 +43,10 @@ const actualizar = (req: Request, res: Response) => {
 };
 
 // Delete
-const borrar = (req: Request, res: Response) => {
+const borrar = async (req: Request, res: Response) => {
     const id = req.params.id;
     try {
-        personaService.borrar(id);
+        await personaService.borrar(id);
         res.status(200).json('Persona eliminada correctamente');
     } catch (err) {
         console.error(err);

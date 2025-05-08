@@ -2,11 +2,11 @@ import { Request, Response } from 'express';
 import autoService from '../service/autoService';
 import { Auto } from '../model/auto';
 
-const agregar = (req: Request, res: Response) => {
+const agregar = async (req: Request, res: Response) => {
     try {
         const auto: Auto = req.body;
-        autoService.agregar(auto); // asumimos que lanza error si algo falla
-        res.status(201).json('Se agregó el auto correctamente');
+        await autoService.agregar(auto); // asumimos que lanza error si algo falla
+        res.status(201).json('Se agrego el auto correctamente');
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
         res.status(400).json(err.message || 'Error al agregar el auto');
@@ -14,17 +14,17 @@ const agregar = (req: Request, res: Response) => {
 };
 
 // Browse
-const listar = (req: Request, res: Response) => {
+const listar = async (req: Request, res: Response) => {
     const id = req.query.id as string | undefined;
-    const autos = autoService.listar(id);
+    const autos = await autoService.listar(id);
     res.status(200).json(autos);
 };
 
 // Read
-const buscar = (req: Request, res: Response) => {
+const buscar = async (req: Request, res: Response) => {
     try {
         const id = req.params.id;
-        const auto = autoService.buscar(id);
+        const auto = await autoService.buscar(id);
 
         if (!auto) {
             res.status(404).json({ mensaje: 'Auto no encontrado' });
@@ -38,17 +38,17 @@ const buscar = (req: Request, res: Response) => {
 };
 
 // Edit
-const actualizar = (req: Request, res: Response) => {
+const actualizar = async (req: Request, res: Response) => {
     try {
         const id = req.params.id;
-        const auto = autoService.actualizar(id, req.body);
+        const auto = await autoService.actualizar(id, req.body);
         res.status(200).json(auto).send();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
         if (err.message === 'Auto no encontrado') {
             res.status(404).json('Auto no encontrado');
         }
-        if (err.message === 'Dueño no encontrado') {
+        if (err.message === 'Duenio no encontrado') {
             res.status(404).json('Dueño no encontrado');
         }
         console.error(err);
@@ -57,9 +57,9 @@ const actualizar = (req: Request, res: Response) => {
 };
 
 // Delete
-const borrar = (req: Request, res: Response) => {
+const borrar = async (req: Request, res: Response) => {
     const id = req.params.id;
-    const eliminado = autoService.borrar(id);
+    const eliminado = await autoService.borrar(id);
 
     if (!eliminado) {
         res.status(404).json('Auto no encontrado').send();

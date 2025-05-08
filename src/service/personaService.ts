@@ -1,9 +1,11 @@
 import { Persona } from '../model/persona';
 import { PersonaDto } from '../dto/personaDto';
-import personaRepository from '../repository/personaRepository';
 import autoService from '../service/autoService';
+import RepositoryFactory from '../repository/RepositoryFactory';
 import { Auto } from '../model/auto';
 import { v4 as uuidv4 } from 'uuid';
+
+const personaRepo = RepositoryFactory.personaRepository();
 
 const validarPersona = (persona: Persona) => {
     return (
@@ -15,56 +17,61 @@ const validarPersona = (persona: Persona) => {
     );
 };
 
-//add
-const agregar = (persona: Persona) => {
-    const id = uuidv4();
-    persona.id = id;
+// add
+const agregar = async (persona: Persona) => {
+    persona.id = uuidv4();
+
     if (validarPersona(persona)) {
-        throw new Error('Datos invalidos');
+        throw Error('Datos invalidos');
     }
-    if (personaRepository.existe(persona.dni)) {
-        throw new Error(`Persona con DNI ${persona.dni} ya existe`);
+    const personas = await personaRepo.all();
+    if (personas.some((p: Persona) => p.dni === persona.dni)) {
+        throw Error(`Persona con DNI ${persona.dni} ya existe`);
     }
     const autosInvalidos = persona.autos.filter((a: Auto) => autoService.validarAuto(a));
     if (autosInvalidos.length > 0) {
-        throw new Error('Algún auto es invalido');
+        throw Error('Algun auto es invalido');
     }
-    personaRepository.create(persona);
+    await personaRepo.save(persona);
 };
 
-//browse
-const listar = (): PersonaDto[] => {
-    return personaRepository.listar().map(({ id, nombre, apellido, dni }) => ({
+// browse
+const listar = async (): Promise<PersonaDto[]> => {
+    const personas = await personaRepo.all();
+    const personasDto: PersonaDto[] = personas.map(({ id, nombre, apellido, dni }: PersonaDto) => ({
         id,
         nombre,
         apellido,
         dni
     }));
+    return personasDto;
 };
 
-//read
-const buscar = (id: string) => {
-    return personaRepository.buscar(id);
+// read
+const buscar = async (id: string): Promise<Persona> => {
+    return await personaRepo.get(id);
 };
 
-// Edit
-const editar = (id: string, nuevosDatos?: Partial<Persona>) => {
-    const persona = personaRepository.buscar(id);
-    if (!persona) {
-        throw new Error('No existe esa persona');
-    }
+// edit
+const editar = async (id: string, nuevosDatos?: Partial<Persona>): Promise<Persona> => {
+    const persona = await personaRepo.get(id);
+
     const nuevaPersona = { ...persona, ...nuevosDatos };
-    personaRepository.actualizar(nuevaPersona);
+    await personaRepo.save(nuevaPersona);
+
     return nuevaPersona;
 };
 
-//delete
-const borrar = (id: string) => {
-    const persona = personaRepository.buscar(id);
-    if (!persona) {
-        throw new Error('no se pudo eliminar');
+// delete
+const borrar = async (id: string): Promise<boolean> => {
+    await personaRepo.get(id);
+
+    const eliminado = await personaRepo.delete(id);
+    if (!eliminado) {
+        throw Error('Error al eliminar la persona');
     }
-    return personaRepository.borrar(id);
+
+    return true;
 };
 
 export default { agregar, listar, buscar, borrar, editar };
