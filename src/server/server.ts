@@ -7,6 +7,7 @@ import process from 'process';
 
 import autoController from '../controller/autoController';
 import personaController from '../controller/personaController';
+import { errorHandler } from '../middlewares/Error';
 
 // Creamos nuestra app express
 const app = express();
@@ -52,6 +53,8 @@ app.put('/auto/:id', autoController.actualizar);
 app.delete('/persona/:id', personaController.borrar);
 
 app.delete('/auto/:id', autoController.borrar);
+
+app.use(errorHandler);
 
 // Levantamos el servidor en el puerto que configuramos
 app.listen(port, () => {

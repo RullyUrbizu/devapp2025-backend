@@ -22,15 +22,21 @@ const agregar = async (persona: Persona) => {
     persona.id = uuidv4();
 
     if (validarPersona(persona)) {
-        throw Error('Datos invalidos');
+        const error = new Error(`Datos invalidos`);
+        error.name = 'DatosInvalidos';
+        throw error;
     }
     const personas = await personaRepo.all();
     if (personas.some((p: Persona) => p.dni === persona.dni)) {
-        throw Error(`Persona con DNI ${persona.dni} ya existe`);
+        const error = new Error(`DNI ${persona.dni} ya existe`);
+        error.name = 'DatosInvalidos';
+        throw error;
     }
     const autosInvalidos = persona.autos.filter((a: Auto) => autoService.validarAuto(a));
     if (autosInvalidos.length > 0) {
-        throw Error('Algun auto es invalido');
+        const error = new Error('Auto invalido');
+        error.name = 'DatosInvalidos';
+        throw error;
     }
     await personaRepo.save(persona);
 };
@@ -68,7 +74,9 @@ const borrar = async (id: string): Promise<boolean> => {
 
     const eliminado = await personaRepo.delete(id);
     if (!eliminado) {
-        throw Error('Error al eliminar la persona');
+        const error = new Error(`Error al eliminar la persona con id ${id}`);
+        error.name = 'ErrorEliminarPersoana';
+        throw error;
     }
 
     return true;
