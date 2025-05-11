@@ -1,4 +1,4 @@
-import { Persona } from '../model/persona';
+import { Persona, validarPersona } from '../model/persona';
 import { PersonaDto } from '../dto/personaDto';
 import autoService from '../service/autoService';
 import RepositoryFactory from '../repository/RepositoryFactory';
@@ -6,16 +6,6 @@ import { Auto } from '../model/auto';
 import { v4 as uuidv4 } from 'uuid';
 
 const personaRepo = RepositoryFactory.personaRepository();
-
-const validarPersona = (persona: Persona) => {
-    return (
-        typeof persona.nombre !== 'string' ||
-        typeof persona.apellido !== 'string' ||
-        typeof persona.dni !== 'string' ||
-        typeof persona.esDonante !== 'boolean' ||
-        !['Masculino', 'Femenino', 'No-Binario'].includes(persona.genero)
-    );
-};
 
 // add
 const agregar = async (persona: Persona) => {
