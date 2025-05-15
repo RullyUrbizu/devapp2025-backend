@@ -5,6 +5,7 @@ import bodyParser from 'body-parser';
 import helmet from 'helmet';
 import process from 'process';
 
+import { AbstractRouter } from '../Router/AbstractRouter';
 import autoController from '../controller/autoController';
 import personaController from '../controller/personaController';
 import { errorHandler } from '../middlewares/Error';
@@ -29,30 +30,8 @@ app.get('/', (req, res) => {
     res.json('hello world');
 });
 
-// Add
-app.post('/persona', personaController.agregar);
-
-app.post('/auto', autoController.agregar);
-
-// Browse
-app.get('/personas', personaController.listar);
-
-app.get('/autos', autoController.listar);
-
-// Read
-app.get('/persona/:id', personaController.buscar);
-
-app.get('/auto/:id', autoController.buscar);
-
-// Edit
-app.put('/persona/:id', personaController.actualizar);
-
-app.put('/auto/:id', autoController.actualizar);
-
-// Delete
-app.delete('/persona/:id', personaController.borrar);
-
-app.delete('/auto/:id', autoController.borrar);
+app.use('/personas', AbstractRouter(personaController));
+app.use('/autos', AbstractRouter(autoController));
 
 app.use(errorHandler);
 
