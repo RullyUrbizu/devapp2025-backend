@@ -11,7 +11,9 @@ const PersonaMemoryRepository: IRepository<Persona> = {
     async get(id: string): Promise<Persona> {
         const persona = personas.find((p) => p.id === id);
         if (!persona) {
-            throw Error(`Persona con ID ${id} no encontrada`);
+            const error = new Error('Persona no encontrada');
+            error.name = 'NoExisteElElemento';
+            throw error;
         }
         return persona;
     },

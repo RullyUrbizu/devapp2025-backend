@@ -1,15 +1,14 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import autoService from '../service/autoService';
 import { Auto } from '../model/auto';
 
-const agregar = async (req: Request, res: Response) => {
+const agregar = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const auto: Auto = req.body;
-        await autoService.agregar(auto); // asumimos que lanza error si algo falla
+        await autoService.agregar(auto);
         res.status(201).json('Se agrego el auto correctamente');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-        res.status(400).json(err.message || 'Error al agregar el auto');
+    } catch (err) {
+        next(err);
     }
 };
 
@@ -21,51 +20,50 @@ const listar = async (req: Request, res: Response) => {
 };
 
 // Read
-const buscar = async (req: Request, res: Response) => {
+const buscar = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const id = req.params.id;
         const auto = await autoService.buscar(id);
 
         if (!auto) {
-            res.status(404).json({ mensaje: 'Auto no encontrado' });
+            const error = new Error('Auto no encontrado');
+            error.name = 'NoExisteElElemento';
+            throw error;
         }
 
         res.status(200).json(auto);
     } catch (err) {
-        console.error('Error al buscar auto:', err);
-        res.status(500).json({ mensaje: 'Error interno del servidor' });
+        next(err);
     }
 };
 
 // Edit
-const actualizar = async (req: Request, res: Response) => {
+const actualizar = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const id = req.params.id;
         const auto = await autoService.actualizar(id, req.body);
         res.status(200).json(auto).send();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-        if (err.message === 'Auto no encontrado') {
-            res.status(404).json('Auto no encontrado');
-        }
-        if (err.message === 'Duenio no encontrado') {
-            res.status(404).json('Dueño no encontrado');
-        }
-        console.error(err);
-        res.status(500).json('Error interno del servidor');
+    } catch (err) {
+        next(err);
     }
 };
 
 // Delete
-const borrar = async (req: Request, res: Response) => {
-    const id = req.params.id;
-    const eliminado = await autoService.borrar(id);
+const borrar = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = req.params.id;
+        const eliminado = await autoService.borrar(id);
 
-    if (!eliminado) {
-        res.status(404).json('Auto no encontrado').send();
+        if (!eliminado) {
+            const error = new Error('Auto no encontrado');
+            error.name = 'NoExisteElElemento';
+            throw error;
+        }
+
+        res.status(200).json({ message: 'Auto eliminado correctamente' });
+    } catch (err) {
+        next(err);
     }
-
-    res.status(200).json('Auto eliminado correctamente');
 };
 
 export default { agregar, buscar, listar, actualizar, borrar };

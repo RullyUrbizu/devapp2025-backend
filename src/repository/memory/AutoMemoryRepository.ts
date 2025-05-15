@@ -14,7 +14,9 @@ const AutoMemoryRepository: IRepository<Auto> = {
         const autos = await this.all();
         const auto = autos.find((a: Auto) => a.id === id);
         if (!auto) {
-            throw new Error(`Auto con ID ${id} no encontrado`);
+            const error = new Error(`Auto con id ${id} no encontrado`);
+            error.name = 'NoExisteElElemento';
+            throw error;
         }
         return auto;
     },

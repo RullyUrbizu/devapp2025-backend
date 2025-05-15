@@ -9,18 +9,24 @@ const agregar = async (auto: Auto): Promise<void> => {
     auto.id = id;
 
     if (validarAuto(auto)) {
-        throw new Error('Datos inválidos');
+        const error = new Error('Auto invalido');
+        error.name = 'DatosInvalidos';
+        throw error;
     }
 
     const duenio = await RepositoryFactory.personaRepository().get(auto.duenio);
     if (!duenio) {
-        throw new Error('Dueño no existe');
+        const error = new Error('Duenio no encontrado');
+        error.name = 'NoExisteElElemento';
+        throw error;
     }
 
     const autos = await RepositoryFactory.autoRepository().all();
     const patenteEnUso = autos.some((a) => a.patente === auto.patente);
     if (patenteEnUso) {
-        throw new Error(`La patente ${auto.patente} ya está en uso`);
+        const error = new Error(`La patente ${auto.patente} ya está en uso`);
+        error.name = 'PatenteEnUso';
+        throw error;
     }
 
     await RepositoryFactory.autoRepository().save(auto);
@@ -51,7 +57,9 @@ const actualizar = async (id: string, nuevoAuto?: Partial<Auto>): Promise<Auto> 
 
     const persona = await RepositoryFactory.personaRepository().get(auto.duenio);
     if (!persona) {
-        throw new Error('Dueño no encontrado');
+        const error = new Error('Duenio no encontrado');
+        error.name = 'NoExisteElElemento';
+        throw error;
     }
 
     const autoActualizado = { ...auto, ...nuevoAuto, id };

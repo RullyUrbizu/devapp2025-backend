@@ -14,12 +14,16 @@ const AutoMongoRepository: IRepository<Auto> = {
         const collection = await getMongoCollection('personas');
         const persona = (await collection.findOne({ 'autos.id': id })) as Persona;
         if (!persona) {
-            throw new Error(`Auto con ID ${id} no encontrado`);
+            const error = new Error('Persona no encontrada');
+            error.name = 'NoExisteElElemento';
+            throw error;
         }
 
         const auto = persona.autos.find((a) => a.id === id);
         if (!auto) {
-            throw new Error(`Auto con ID ${id} no encontrado`);
+            const error = new Error(`Auto con patente ${id} no encontrado`);
+            error.name = 'NoExisteElElemento';
+            throw error;
         }
 
         return auto;
@@ -29,7 +33,9 @@ const AutoMongoRepository: IRepository<Auto> = {
         const collection = await getMongoCollection('personas');
         const persona = (await collection.findOne({ id: entity.duenio })) as Persona;
         if (!persona) {
-            throw new Error(`Dueño con ID ${entity.duenio} no encontrado`);
+            const error = new Error(`Dueño con ID ${entity.duenio} no encontrado`);
+            error.name = 'NoExisteElElemento';
+            throw error;
         }
 
         const autos = persona.autos || [];
