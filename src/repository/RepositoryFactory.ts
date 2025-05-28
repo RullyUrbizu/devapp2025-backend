@@ -5,6 +5,8 @@ import AutoMemoryRepository from './memory/AutoMemoryRepository';
 import PersonaMemoryRepository from './memory/PersonaMemoryRepository';
 import PersonaMongoRepository from './mongodb/PersonaMongoRepository';
 import AutoMongoRepository from './mongodb/AutoMongoRepository';
+import PersonaFirebaseRepository from './firebase/PersonaFirebaseRepository';
+import AutoFirebaseRepository from './firebase/AutoFirebaseRepository';
 
 let personaRepositorySingletonInstance: IRepository<Persona> | undefined = undefined;
 let autoRepositorySingletonInstance: IRepository<Auto> | undefined = undefined;
@@ -31,6 +33,9 @@ const RepositoryFactory = {
         if (process.env.REPOSITORY === 'Mongodb') {
             return PersonaMongoRepository;
         }
+        if (process.env.REPOSITORY === 'Firebase') {
+            return PersonaFirebaseRepository;
+        }
         return PersonaMemoryRepository;
     },
 
@@ -40,6 +45,9 @@ const RepositoryFactory = {
         }
         if (process.env.REPOSITORY === 'Mongodb') {
             return AutoMongoRepository;
+        }
+        if (process.env.REPOSITORY === 'Firebase') {
+            return AutoFirebaseRepository;
         }
         return AutoMemoryRepository;
     }
